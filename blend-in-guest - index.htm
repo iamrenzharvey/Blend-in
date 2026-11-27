@@ -1,0 +1,1619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A top-down hide-and-seek game. Become a prop or find the impostors.">
+<title>Blend In · Hide & Seek</title>
+<style>
+:root{color-scheme:dark;--bg:#111317;--panel:#191c21;--line:#30343c;--text:#f5f3ea;--muted:#b3b5bd;--lime:#d7f789;--ink:#202916}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 30% 0%,#252930 0%,var(--bg) 56%);color:var(--text);font:16px system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:0 clamp(14px,3.5vw,56px) 28px}.top{height:74px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin-bottom:24px}.brand{font-weight:900;font-size:24px;letter-spacing:-.05em}.brand>span{color:var(--lime)}.logo{margin-right:5px}.mode,.label{font:700 .81rem ui-monospace,monospace;letter-spacing:.095em;color:var(--muted)}.mode{display:flex;align-items:center;gap:9px}.mode i{width:8px;height:8px;border-radius:50%;background:var(--lime)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 305px;gap:20px;align-items:start}.arena,.settings{border:1px solid var(--line);border-radius:15px;background:var(--panel);overflow:hidden}.board-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px}.board-head h1{margin:2px 0 0;font-size:clamp(1.45rem,3vw,2.05rem);line-height:1.1;letter-spacing:-.055em}.clock{text-align:right}.clock strong{font:750 1.9rem ui-monospace,monospace;color:var(--lime)}.board{position:relative;background:#15191b}#field{display:block;width:100%;height:auto;outline-offset:-3px}.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#1115177a;padding:16px}.overlay[hidden],button[hidden]{display:none}.modal{background:#191d22f5;border:1px solid #525b52;border-radius:14px;width:min(100%,450px);padding:clamp(14px,3vw,34px);box-shadow:0 18px 70px #0008;text-align:center}.modal .label{color:var(--lime);margin:0 0 7px}.modal h2{font-size:clamp(1.45rem,4vw,2.75rem);line-height:1.03;letter-spacing:-.065em;margin:0}.modal p:not(.label){margin:11px auto 19px;max-width:35ch;color:var(--muted);line-height:1.45}.primary{background:var(--lime);border:1px solid transparent;color:var(--ink);font-weight:850;padding:11px 23px;border-radius:8px}.primary:hover{background:#e6ffac}.board-foot{display:flex;align-items:center;gap:16px;min-height:71px;padding:12px 20px}.board-foot>div{flex:none}.board-foot p{font-size:.91rem;color:var(--muted);margin:0;flex:1}.pips{display:flex;gap:5px;margin-top:6px}.pips i{width:12px;height:9px;border-radius:2px;border:1px solid #727983}.pips i.filled{border-color:var(--lime);background:var(--lime)}.quiet{color:var(--muted);border:1px solid var(--line);padding:7px 9px;border-radius:7px;background:transparent;white-space:nowrap}.settings{padding:17px}.settings h2{margin:0 0 17px;font-size:1.42rem;letter-spacing:-.045em}fieldset{padding:0;border:0;margin:0 0 15px;min-width:0}legend,.controls h3{font-size:.89rem;font-weight:720;color:var(--muted);padding:0;margin:0 0 8px}.map{display:flex;text-align:left;width:100%;align-items:center;gap:10px;padding:7px;background:#202329;border:1px solid var(--line);border-radius:8px;color:inherit;margin-bottom:6px}.map:last-child{margin-bottom:0}.map canvas{width:53px;height:32px;border-radius:4px;flex:none}.map strong,.map small{display:block}.map small{color:var(--muted);margin-top:2px;font-size:.8rem}.map.active,.segments button[aria-pressed=true]{border-color:var(--lime);background:#2d3826}.map:hover,.segments button:hover,.quiet:hover{filter:brightness(1.2)}.segments{display:grid;grid-template-columns:1fr 1fr;gap:7px}.segments button{padding:8px 9px;color:inherit;border:1px solid var(--line);border-radius:7px;background:#202329}.duration{display:flex;gap:10px;align-items:center}.duration input{flex:1;min-width:0;accent-color:var(--lime)}output{font:750 .93rem ui-monospace,monospace;min-width:45px;text-align:right;color:var(--lime)}.controls{border-top:1px solid var(--line);padding-top:12px}.controls>div{display:grid;grid-template-columns:106px 1fr;align-items:center;gap:6px;margin-top:7px;font-size:.85rem}.muted{color:var(--muted)}kbd{display:inline-grid;place-items:center;width:23px;height:23px;border:1px solid #444952;border-radius:4px;background:#24282e;margin-right:3px}button,input{font:inherit}button{cursor:pointer}button:disabled,input:disabled{cursor:default;opacity:.6}button:focus-visible,input:focus-visible,canvas:focus-visible{outline:2px solid #e4faab;outline-offset:2px}
+@media(max-width:880px){.layout{grid-template-columns:minmax(0,1fr) 250px;gap:12px}.settings{padding:12px}.controls>div{grid-template-columns:106px 1fr}}@media(max-width:700px){.layout{grid-template-columns:minmax(0,1fr)}.top{height:56px;margin-bottom:12px}.settings{padding:16px}.board-foot,.board-head{padding:11px 12px}.modal p:not(.label){margin:6px 0 10px;font-size:.88rem}.map canvas{width:65px;height:39px}}@media(max-width:390px){.overlay{padding:7px}.modal{padding:9px}.primary{padding:7px 14px}.board-foot{gap:8px}}
+.setup-note{margin:-4px 0 12px;color:var(--muted);font-size:.83rem;line-height:1.4}#rooms{border-top:1px solid var(--line);margin-top:15px;padding-top:12px}#rooms summary{cursor:pointer;font-weight:740;font-size:.94rem}#rooms p,#rooms a{font-size:.84rem;line-height:1.4;color:var(--muted)}#rooms textarea{display:block;margin:5px 0;width:100%;resize:vertical;padding:6px;border-radius:5px;background:#202329;color:var(--text);border:1px solid #535861;font: .82rem ui-monospace,monospace}#rooms a{display:inline-block;margin-top:9px;color:var(--lime)}#rooms [hidden]{display:none}
+.view-tools{display:flex;align-items:center;gap:15px}.view-select{grid-template-columns:auto auto}.view-select button{font-size:.8rem;white-space:nowrap}.view-select button[aria-pressed=true]{color:var(--lime)}#scene{width:100%;height:auto;display:block;outline-offset:-3px;background:#243943}#field[hidden],#scene[hidden],.view-hud[hidden],.controls>[hidden]{display:none}.view-hud{position:absolute;inset:0;pointer-events:none}.view-hud #minimap{position:absolute;right:12px;bottom:12px;width:min(23%,180px);height:auto;border-radius:7px;border:1px solid #eef5c45e;background:#171b20d9;box-shadow:0 4px 15px #0006}.view-hud #reticle{position:absolute;top:50%;left:50%;width:13px;height:13px;transform:translate(-50%,-50%);border:2px solid #fff9db;border-radius:50%;filter:drop-shadow(0 1px 2px #181923)}.view-hud #reticle.ready{border-color:#d7f789;background:#d7f78955}.view-hud #focusPrompt{position:absolute;left:50%;top:calc(50% + 15px);transform:translateX(-50%);border-radius:5px;background:#181d25df;padding:4px 8px;color:#f5f3ea;white-space:nowrap;font:700 .77rem system-ui,sans-serif}.view-hud #focusPrompt:empty{display:none}.board:has(#scene:not([hidden])) .overlay{background:linear-gradient(110deg,#0c1b2869,#1b252953)}#graphicsStatus{margin-top:12px}
+@media(max-width:500px){.view-tools{gap:6px}.clock strong{font-size:1.38rem}.clock .label{font-size:.65rem}.view-select button{padding:6px 5px;font-size:.73rem}.board-head h1{font-size:1.3rem}}
+
+.view-hud #disguiseHud{position:absolute;top:12px;left:12px;padding:5px 9px;border:1px solid #e8f4b446;border-radius:6px;background:#1a242bdc;color:#eff5dc;font:700 .81rem system-ui,sans-serif;text-transform:capitalize}.view-hud #disguiseHud[hidden]{display:none}
+
+#boardHud{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.board:has(#boardHud:not([hidden])) .overlay{background:#131b2366}.motion-option{display:flex;align-items:center;gap:7px;margin-top:13px;color:var(--muted);font-size:.83rem;cursor:pointer}.motion-option[hidden],#boardHud[hidden]{display:none}.motion-option input{accent-color:var(--lime)}.ability{display:flex;align-items:center;gap:7px;width:100%;margin-top:12px;padding:7px 9px;border:1px solid #63744b;border-radius:7px;background:#2a3627;color:var(--text);text-align:left}.ability small{margin-left:auto;color:var(--lime);font-size:.8rem}.ability[hidden]{display:none}.ability:not(:disabled):hover{background:#394832}.ability kbd{margin:0}.modal #review{margin-left:6px}.board-foot:has(#pauseRound:not([hidden])){gap:9px}.board-foot .quiet{font-size:.82rem}.board-head .view-tools .segments button{padding:7px 9px}@media(max-width:470px){.board-foot{flex-wrap:wrap}.board-head .view-tools .segments button{padding:5px 4px}.view-tools{gap:5px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.seeker-wait{position:absolute;inset:0;display:grid;align-content:center;justify-items:center;text-align:center;gap:7px;pointer-events:none;padding:14px;color:var(--muted)}.seeker-wait[hidden]{display:none}.seeker-wait strong{color:var(--text);font-size:clamp(1.15rem,4vw,1.8rem);letter-spacing:-.035em}
+
+</style>
+
+
+
+</head>
+<body>
+<main>
+  <header class="top"><div class="brand"><span class="logo" aria-hidden="true">◈</span> BLEND<span> IN</span></div><span class="mode"><i></i><span id="mode">SOLO PLAYTEST</span></span></header>
+  <div class="layout">
+    <section class="arena" aria-label="Game board">
+      <header class="board-head"><div><div id="environment" class="label">INDOOR</div><h1 id="mapName">Corner Café</h1></div><div class="view-tools"><div class="segments view-select" aria-label="Camera view"><button id="view3d" aria-pressed="false">Board 3D</button><button id="view2d" aria-pressed="true">Top-down</button></div><div class="clock"><div id="phase" class="label">SEARCH TIME</div><strong id="timer">02:00</strong></div></div></header>
+      <div class="board">
+        <canvas id="field" width="960" height="576" tabindex="0" aria-label="Top-down game board"></canvas>
+        <canvas id="scene" width="960" height="576" tabindex="0" aria-label="First-person 3D view" hidden></canvas>
+        <canvas id="boardHud" width="960" height="576" aria-hidden="true" hidden></canvas>
+        <div id="viewHud" class="view-hud" hidden aria-hidden="true">
+          <span id="reticle"></span><span id="focusPrompt"></span><span id="disguiseHud" hidden></span>
+          <canvas id="minimap" width="180" height="108"></canvas>
+        </div>
+        <div id="seekerWait" class="seeker-wait" hidden>
+          <strong>Hiders are finding cover</strong>
+          <span>Search starts when the countdown ends.</span>
+        </div>
+        <div id="overlay" class="overlay"><div class="modal">
+          <p id="overlayLabel" class="label">HIDE & SEEK</p><h2 id="overlayTitle">Something looks off.</h2>
+          <p id="overlayText">That stool belongs by the counter. The one facing the wall? Take a closer look.</p>
+          <button id="start" class="primary">Start round</button>
+          <button id="review" class="quiet" type="button" hidden>Review map</button>
+        </div></div>
+      </div>
+      <footer class="board-foot"><div><span id="objectiveLabel" class="label">HIDERS FOUND</span><div id="pips" class="pips" aria-label="0 out of 5 hiders found"></div></div><p id="status" role="status">Choose a map and role to begin.</p><button id="backResults" class="quiet" type="button" hidden>Results</button><button id="pauseRound" class="quiet" type="button" hidden>Pause</button><button id="reset" class="quiet" hidden>End round</button></footer>
+    </section>
+    <aside class="settings" aria-label="Round setup">
+      <h2>Round setup</h2>
+      <fieldset id="maps">
+        <legend>Environment</legend>
+        <button class="map active" type="button" data-map="cafe" aria-pressed="true"><canvas width="88" height="53" aria-hidden="true"></canvas><span><strong>Corner Café</strong><small>Counter & stockroom</small></span></button>
+        <button class="map" type="button" data-map="garden" aria-pressed="false"><canvas width="88" height="53" aria-hidden="true"></canvas><span><strong>Glasshouse</strong><small>Garden paths & potting shed</small></span></button>
+        <button class="map" type="button" data-map="depot" aria-pressed="false"><canvas width="88" height="53" aria-hidden="true"></canvas><span><strong>Night Depot</strong><small>Shelf aisles & loading bays</small></span></button>
+      </fieldset>
+      <fieldset><legend>Your role</legend><div class="segments"><button id="seeker" aria-pressed="true">Seeker</button><button id="hider" aria-pressed="false">Hider</button></div></fieldset>
+      <fieldset><legend><label for="duration">Search duration</label></legend><div class="duration"><input type="range" min="30" max="300" step="15" value="120" id="duration"><output id="durationValue" for="duration">2:00</output></div></fieldset>
+      <p id="setupNote" class="setup-note" hidden></p>
+      <div class="controls"><h3>Controls</h3><div><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><span id="movementHint">Move <span class="muted">/ arrow keys</span></span></div><div id="lookControls" hidden><span><kbd>←</kbd><kbd>→</kbd></span><span>Turn or click to use mouse</span></div><div><span><kbd>E</kbd></span><span id="actionHint">Inspect nearby prop</span></div><div id="rotateControls" hidden><span><kbd>R</kbd></span><span>Rotate disguise</span></div></div>
+      <button id="roleAbility" class="ability" type="button" hidden><kbd id="abilityKey">Q</kbd><span id="abilityText">Listen</span><small id="abilityState"></small></button>
+      <label id="motionOption" class="motion-option" hidden><input id="viewFirst" type="checkbox"><span>First-person camera</span></label>
+      <p id="graphicsStatus" class="setup-note" role="status" hidden></p>
+      <details id="rooms">
+        <summary>Private multiplayer</summary>
+        <p id="roomStatus" role="status">Play with one friend and four bots.</p>
+        <div id="roomChoices" class="segments"><button id="hostRoom" type="button">Host</button><button id="joinRoom" type="button">Join</button></div>
+        <div id="roomExchange" hidden>
+          <p id="outboundGroup" hidden><label for="outbound">Code to send to your friend</label><textarea id="outbound" rows="2" readonly></textarea><button id="copyCode" class="quiet" type="button">Copy code</button></p>
+          <p id="inboundGroup" hidden><label id="inboundLabel" for="inbound"></label><textarea id="inbound" rows="2" spellcheck="false"></textarea><button id="acceptCode" class="quiet" type="button">Connect</button></p>
+        </div>
+        <button id="leaveRoom" class="quiet" type="button" hidden>Leave room</button>
+        <a id="guestCopy" href="blend-in-guest.html" download>Download a copy for a friend</a>
+      </details>
+    </aside>
+  </div>
+</main>
+<script>
+"use strict";
+
+const W = 20, H = 12, T = 48;
+const maps = {
+  cafe: {
+    name:"Corner Café", environment:"INDOOR", floors:["#8c6c56","#716053","#ab8162"], wall:"#483631", trim:"#8c5d43", spawn:[1,10], entry:[6,6],
+    walls:[[12,1,1,4],[12,7,1,4],[13,6,3,1],[18,6,1,1],[2,3,7,1],[3,9,3,1]],
+    zones:[[1,1,11,4,0,"COUNTER"],[1,5,11,6,2,"DINING ROOM"],[13,1,6,5,1,"STOCKROOM"],[13,7,6,4,0,"KITCHEN"]],
+    props:[
+      ["stool",2,2],["stool",4,4],["stool",5,4],["stool",6,4],["stool",7,4],["plant",10,2],["plant",11,9],
+      ["table",4,6],["table",8,6],["table",8,9],["stool",3,6],["stool",5,6],["stool",7,6],["stool",9,6],["stool",7,9],["stool",9,9],
+      ["box",14,2],["box",15,2],["box",17,2],["box",17,3],["box",17,4],["plant",18,5],["box",18,9],["stool",15,9],["table",16,8]
+    ],
+    clue:"A stool belongs by the counter. A box beside a table is worth a closer look."
+  },
+  garden: {
+    name:"Glasshouse", environment:"GARDEN", floors:["#426849","#817a57","#566749"], wall:"#253e33", trim:"#4b865f", spawn:[1,10], entry:[9,9],
+    walls:[[3,3,4,2],[3,7,4,2],[9,2,1,5],[11,4,4,2],[11,8,4,1],[16,1,1,2],[16,4,1,2],[16,8,1,3],[17,5,2,1]],
+    zones:[[1,1,8,10,0,"GROW BEDS"],[10,1,6,10,1,"GARDEN PATHS"],[17,1,2,4,2,"POTTING SHED"],[17,6,2,5,0,"PATIO"]],
+    props:[
+      ["pot",2,2],["pot",4,2],["pot",5,2],["pot",6,2],["pot",6,6],["pot",3,6],["pot",4,6],["pot",5,6],["pot",4,9],
+      ["can",7,2],["can",2,6],["can",7,9],["plant",1,4],["plant",1,8],["plant",7,5],["plant",10,2],["plant",12,3],
+      ["bench",12,6],["bench",14,6],["bench",12,9],["pot",17,2],["pot",18,2],["can",17,3],["can",18,3],["bench",18,9],["plant",18,7]
+    ],
+    clue:"Pots cluster by the beds. Look for a watering can that strays onto the garden path."
+  },
+  depot: {
+    name:"Night Depot", environment:"WAREHOUSE", floors:["#4b596a","#536478","#666b65"], wall:"#2b3545", trim:"#6b8296", spawn:[1,1], entry:[9,7],
+    walls:[[4,2,1,7],[8,2,1,6],[12,3,1,7],[15,2,1,4],[15,8,4,1],[2,9,2,1]],
+    zones:[[1,1,11,10,0,"STORAGE AISLES"],[13,1,6,7,1,"LOADING BAY"],[13,9,6,2,2,"RETURNS"]],
+    props:[
+      ["pallet",2,2],["crate",2,3],["crate",2,4],["crate",3,6],["barrel",2,7],["crate",5,2],["crate",5,3],["crate",5,5],["pallet",6,6],["barrel",6,8],
+      ["barrel",9,2],["barrel",9,3],["crate",10,5],["pallet",9,6],["crate",11,8],["pallet",9,9],["pallet",14,3],["pallet",14,4],
+      ["crate",17,2],["crate",18,2],["barrel",17,4],["barrel",18,4],["pallet",16,6],["pallet",18,6],["crate",14,10],["barrel",17,10]
+    ],
+    clue:"Crates hug the shelves and pallets cluster in the bays. Watch the long aisles for movement."
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+const ctx = $("field").getContext("2d");
+const keys = new Set();
+const mapButtons = [...document.querySelectorAll("[data-map]")];
+const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
+let map = maps.cafe, role = "seeker", game = null, last = 0, dirty = true;
+let firstPerson = null;
+let room = null, nextRole = null, guestInput = [0,0], guestLastInput = 0, sentAt = 0, roomVersion = 0;
+const opposite = (side) => side==="seeker"?"hider":"seeker";
+const mapKey = () => Object.keys(maps).find(key=>maps[key]===map);
+const isGuest = () => room?.side==="guest";
+const isActive = () => game && game.phase!=="result";
+const tile = (x) => Math.floor(x / T);
+const center = (x,y) => ({x:(x+.5)*T,y:(y+.5)*T});
+const dist = (a,b) => Math.hypot(a.x-b.x,a.y-b.y);
+const pick = (items) => items[Math.floor(Math.random()*items.length)];
+const seconds = (n) => Math.ceil(Math.max(0,n));
+function time(n, pad = false) {
+  const val = seconds(n);
+  return (pad ? String(Math.floor(val/60)).padStart(2,"0") : Math.floor(val/60)) + ":" + String(val%60).padStart(2,"0");
+}
+function blocked(m,x,y) {
+  return x<1 || y<1 || x>=W-1 || y>=H-1 || m.walls.some(([a,b,w,h])=>x>=a && y>=b && x<a+w && y<b+h);
+}
+function visible(m,a,b,range=Infinity) {
+  const length = dist(a,b);
+  if (length>range) return false;
+  const steps = Math.ceil(length/7);
+  for(let i=1;i<steps;i++) {
+    const n=i/steps;
+    if(blocked(m,tile(a.x+(b.x-a.x)*n),tile(a.y+(b.y-a.y)*n))) return false;
+  }
+  return true;
+}
+function route(m, from, target) {
+  const start=tile(from.y)*W+tile(from.x), goal=tile(target.y)*W+tile(target.x);
+  const came=new Int16Array(W*H).fill(-1), queue=[start];
+  came[start]=start;
+  for(let i=0;i<queue.length && came[goal]===-1;i++) {
+    const here=queue[i], x=here%W, y=Math.floor(here/W);
+    for(const [dx,dy] of dirs) {
+      const next=(y+dy)*W+x+dx;
+      if(!blocked(m,x+dx,y+dy) && came[next]===-1) { came[next]=here; queue.push(next); }
+    }
+  }
+  if(came[goal]===-1) return [];
+  const result=[];
+  for(let n=goal;n!==start;n=came[n]) result.push(center(n%W,Math.floor(n/W)));
+  return result.reverse().concat(target);
+}
+
+function rect(c,x,y,w,h,color) {
+  c.fillStyle=color; c.fillRect(x,y,w,h);
+}
+function ellipse(c,x,y,rx,ry,color) {
+  c.beginPath(); c.ellipse(x,y,rx,ry,0,0,Math.PI*2); c.fillStyle=color; c.fill();
+}
+function drawProp(c,type,x,y,rot=0) {
+  c.save(); c.translate(x,y); c.rotate(rot);
+  ellipse(c,2,5,15,11,"#151a2270");
+  switch(type) {
+    case "stool":
+      rect(c,-11,-8,22,20,"#613d33"); rect(c,-12,-11,24,20,"#b25c43"); rect(c,-10,-10,20,4,"#dd8260"); rect(c,-8,5,16,3,"#8e4938"); break;
+    case "plant":
+    case "pot":
+      ellipse(c,0,2,14,13,"#52362d"); ellipse(c,0,-1,14,12,"#bd744f");
+      ellipse(c,0,-2,10,8,"#45372e");
+      ellipse(c,-5,-5,6,8,"#467753"); ellipse(c,4,-7,6,9,"#6d9d60"); ellipse(c,2,1,7,4,"#85b575"); break;
+    case "table":
+    case "bench":
+      rect(c,-16,-9,32,24,"#3a3931"); rect(c,-17,-13,34,23,type==="table"?"#ad7851":"#966d47");
+      rect(c,-15,-11,30,3,"#c29c6b"); rect(c,-14,-2,28,2,"#76583d"); break;
+    case "can":
+      ellipse(c,1,0,10,10,"#578da0"); ellipse(c,2,-3,6,5,"#83b8c2");
+      rect(c,-15,-2,8,5,"#739aad"); rect(c,-15,-5,3,9,"#96c3cd"); break;
+    case "barrel":
+      ellipse(c,0,1,12,13,"#263b55"); ellipse(c,0,-2,12,12,"#547b9b");
+      ellipse(c,0,-3,8,8,"#7199b5"); ellipse(c,4,-6,2,2,"#c1c2a1"); break;
+    case "pallet":
+      rect(c,-15,-12,30,26,"#5d4a33"); for(let i=-11;i<=9;i+=7) rect(c,i,-12,4,23,"#bb9c66"); break;
+    default:
+      rect(c,-13,-10,26,23,"#614736"); rect(c,-13,-13,26,22,"#ac8357");
+      rect(c,-12,-11,24,3,"#d8ab72"); rect(c,-3,-13,6,22,"#c39d6a");
+      if(type==="crate") rect(c,-10,5,20,3,"#755739");
+  }
+  c.restore();
+}
+function drawMap(c,m,props,labels=true) {
+  rect(c,0,0,W*T,H*T,m.floors[0]);
+  for(const [x,y,w,h,k,name] of m.zones) {
+    rect(c,x*T,y*T,w*T,h*T,m.floors[k]);
+    if(labels) {
+      c.font="bold 11px monospace"; c.fillStyle="#f7eeda9e"; c.fillText(name,x*T+8,y*T+16);
+    }
+  }
+  for(let y=1;y<H-1;y++) for(let x=1;x<W-1;x++) {
+    const px=x*T,py=y*T, grain=(x*7+y*13)%11;
+    rect(c,px,py,T,1,"#14202638");
+    rect(c,px,py,1,T,"#14202638");
+    if(m===maps.cafe) {
+      rect(c,px+3,py+16+(grain%3)*6,34,1,"#f4d2a42b");
+      rect(c,px+12,py+8,27,1,"#f4d2a41c");
+    } else if(m===maps.garden) {
+      if(grain<7) {
+        ellipse(c,px+11+grain*3,py+16+grain,9,6,"#87a57542");
+        ellipse(c,px+24,py+34,3,2,"#c1c68e59");
+      }
+    } else if(x%4===2) {
+      rect(c,px+4,py+10,4,26,"#e8b97980");
+      rect(c,px+8,py+10,2,26,"#292e3e75");
+    }
+  }
+  for(const [x,y,w,h] of [[0,0,W,1],[0,H-1,W,1],[0,1,1,H-2],[W-1,1,1,H-2],...m.walls]) {
+    rect(c,x*T+5,y*T+9,w*T,h*T,"#141a254c");
+    rect(c,x*T,y*T+4,w*T,h*T,m.wall);
+    rect(c,x*T,y*T,w*T,h*T-8,m.trim);
+    rect(c,x*T+3,y*T+3,w*T-6,h*T-12,m.wall);
+    rect(c,x*T+4,y*T+3,w*T-8,3,"#f7d5ae45");
+    if(m===maps.depot && w+h>3) {
+      for(let i=0;i<Math.max(w,h);i++) {
+        const px=(x+(w>h?i:0))*T, py=(y+(w>h?0:i))*T;
+        rect(c,px+8,py+9,w>h?3:30,w>h?23:3,"#a0a6b058");
+      }
+    }
+    if(m===maps.garden && w>=3 && w<W) {
+      for(let i=0;i<w*2;i++) ellipse(c,x*T+10+i*22,y*T+14+Math.cos(i*2)*5,8,5,i%2?"#729d6280":"#8db77770");
+    }
+  }
+  for(const p of props) drawProp(c,p.type,p.x,p.y,p.rot);
+}
+function staticProps(m) {
+  return m.props.map(([type,x,y],i)=>({type,...center(x,y),rot:i%9===0?.24:0,checked:false}));
+}
+function roundProps(m) {
+  return staticProps(m).map((prop,i)=>{
+    if(i%3!==0) return prop;
+    return {...prop,x:prop.x+(Math.random()-.5)*13,y:prop.y+(Math.random()-.5)*13,
+      rot:prop.rot+(Math.random()<.25?Math.PI/2:0)};
+  });
+}
+
+function player(c,a,color) {
+  ellipse(c,a.x+2,a.y+6,13,9,"#0d121a80");
+  ellipse(c,a.x,a.y,12,12,"#20282a"); ellipse(c,a.x,a.y,9,9,color);
+  ellipse(c,a.x+2,a.y-3,3,3,"#fff6d9");
+}
+function ring(c,a,color,r=19) {
+  c.beginPath();c.arc(a.x,a.y,r,0,Math.PI*2);c.strokeStyle=color;c.lineWidth=2;c.stroke();
+}
+function render() {
+  if(firstPerson?.mode!=="flat"&&firstPerson) { firstPerson.draw(); return; }
+  const active=game && game.phase!=="result", seekerView=active && role==="seeker";
+  const props=game ? game.props : staticProps(map);
+  drawMap(ctx,map,props);
+  if(!game) return;
+  if (seekerView && game.phase==="hide") {
+    rect(ctx,0,0,W*T,H*T,"#12171df0");
+  } else {
+    for(const h of game.hiders) {
+      if(h.caught || (seekerView && !visible(map,game.seeker,h,260))) continue;
+      if(h.disguise) drawProp(ctx,h.disguise,h.x,h.y,h.rot);
+      else player(ctx,h,"#ffba86");
+      if(h.human && role==="hider") ring(ctx,h,"#e7ffab",19);
+      if(game.phase==="result") ring(ctx,h,"#ffcf8d",20);
+    }
+    if(seekerView) {
+      const observer=game.seeker;
+      ctx.beginPath();
+      ctx.rect(0,0,W*T,H*T);
+      const rays=240;
+      for(let i=0;i<rays;i++) {
+        const a=i*Math.PI*2/rays, dx=Math.cos(a),dy=Math.sin(a);
+        let r=5;
+        for(;r<260;r+=5) {
+          if(blocked(map,tile(observer.x+dx*r),tile(observer.y+dy*r))) break;
+        }
+        const x=observer.x+dx*r,y=observer.y+dy*r;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath(); ctx.fillStyle="#101820b8"; ctx.fill("evenodd");
+    }
+  }
+  if(game.phase!=="hide" || role==="seeker") {
+    player(ctx,game.seeker,"#dcf992");
+    if(role==="seeker") ring(ctx,game.seeker,"#e7ffab",19);
+  }
+  if(active && !(role==="seeker" && game.phase==="hide")) {
+    if(role==="seeker"&&game.listenMark?.until>game.elapsed) {
+      ring(ctx,game.listenMark,"#fdd396",game.listenMark.radius);
+      ring(ctx,game.listenMark,"#fdd396",7);
+    }
+    const near=actionTarget();
+    if(near) ring(ctx,near,"#f4edc4",18);
+    for(const p of game.props) if(p.hintUntil>game.elapsed) ring(ctx,p,"#ef9f85",20);
+    if(game.mark && game.mark.until>game.elapsed) ring(ctx,game.mark,"#ddf889",24);
+  }
+}
+
+function begin() {
+  if(isGuest()) return;
+  if(nextRole) {
+    role=nextRole;
+    nextRole=null;
+  }
+  roomVersion++;
+  firstPerson?.reset();
+  guestInput=[0,0];
+  const props=roundProps(map), seeker={...center(...map.spawn),path:[],think:0,cooldown:0};
+  const hiders=Array.from({length:5},(_,i)=>({
+    ...center(map.entry[0]+(i%3-1)*.3,map.entry[1]+Math.floor(i/3)*.3),
+    id:i,human:(role==="hider"||!!room)&&i===0,disguise:null,path:[],caught:false,locked:false,think:0,rot:0,movedUntil:0
+  }));
+  game={phase:"hide",remaining:20,duration:Number($("duration").value),elapsed:0,seeker,hiders,props,cooldown:0,found:0,spots:[],mark:null,guestStatus:"",winner:null,listenReady:0,listenMark:null,paused:false};
+  const occupied=new Set(props.map(p=>tile(p.y)*W+tile(p.x)));
+  for(const p of props) for(const [dx,dy] of dirs) {
+    const x=tile(p.x)+dx,y=tile(p.y)+dy;
+    if(!occupied.has(y*W+x) && !blocked(map,x,y) && route(map,hiders[0],center(x,y)).length) {
+      game.spots.push({...center(x,y),type:p.type,rot:p.rot});
+    }
+  }
+  for(const h of hiders) if(!h.human) chooseSpot(h,true);
+  $("overlay").hidden=true;
+  $("reset").hidden=false;
+  $("pauseRound").hidden=!!room;
+  $("review").hidden=true;
+  $("backResults").hidden=true;
+  setupControls();
+  keys.clear();
+  focusField();
+  setStatus(role==="seeker"?"The hiders are choosing disguises.":"Move near a prop and press E to copy it.");
+  refresh();
+  sendRoomState();
+}
+
+function chooseSpot(h, first=false) {
+  const candidates=game.spots.filter(p=>dist(p,game.seeker)>(first?140:105) && dist(p,h)<(first?Infinity:208) &&
+    game.hiders.every(other=>other===h||other.caught||(dist(p,other)>35 && (!other.goal||dist(p,other.goal)>33))));
+  if(candidates.length) {
+    const spot=pick(candidates);
+    h.path=route(map,h,spot);
+    h.goal=spot;
+  }
+  h.think=game.elapsed+7+h.id*1.25+Math.random()*10;
+}
+
+function move(a,dx,dy) {
+  const can=(x,y)=>[-9,9].every(ox=>[-9,9].every(oy=>!blocked(map,tile(x+ox),tile(y+oy))));
+  if(can(a.x+dx,a.y)) a.x+=dx;
+  if(can(a.x,a.y+dy)) a.y+=dy;
+}
+
+function follow(a, step) {
+  const next=a.path[0];
+  if(!next) return;
+  const d=dist(a,next);
+  if(d<=step) {
+    a.x=next.x;
+    a.y=next.y;
+    a.path.shift();
+  } else {
+    a.x+=(next.x-a.x)/d*step;
+    a.y+=(next.y-a.y)/d*step;
+  }
+}
+
+function nearest(items,origin,range) {
+  let best;
+  for(const p of items) {
+    const d=dist(p,origin);
+    if(d<=range && visible(map,origin,p)) { best=p; range=d; }
+  }
+  return best;
+}
+
+function aimedTarget(items, origin, range, yaw) {
+  if(!Number.isFinite(yaw)) return null;
+  let best=null, score=Infinity;
+  for(const item of items) {
+    const dx=item.x-origin.x, dy=item.y-origin.y;
+    const depth=dx*Math.cos(yaw)+dy*Math.sin(yaw);
+    const lateral=Math.abs(-dx*Math.sin(yaw)+dy*Math.cos(yaw));
+    if(depth<=4||Math.hypot(dx,dy)>range||lateral>12+depth*.09||!visible(map,origin,item)) continue;
+    const candidate=depth+lateral*1.4;
+    if(candidate<score) { best=item; score=candidate; }
+  }
+  return best;
+}
+
+function actionTarget(side=role,yaw=null) {
+  const target=yaw===null?nearest:(items,origin,range)=>aimedTarget(items,origin,range+13,yaw);
+  if(side==="hider") {
+    const h=game.hiders[0];
+    return !h||h.caught?null:target(game.props,h,57);
+  }
+  const targets=game.props.concat(game.hiders.filter(h=>!h.caught));
+  return target(targets,game.seeker,53);
+}
+
+function playerStatus(side,message) {
+  if(side===role) setStatus(message);
+  else if(room) game.guestStatus=message;
+}
+
+function inspect(target, human) {
+  if(game.hiders.includes(target)) {
+    target.caught=true;
+    game.found++;
+    game.mark={x:target.x,y:target.y,until:game.elapsed+1};
+    if(human) playerStatus("seeker","Good eye! You found a hider.");
+    playerStatus("hider",target.human?"You were found. Watch the rest of the round.":"The seeker found one of your teammates.");
+    if(game.found===5) finish("seeker");
+  } else {
+    target.checked=true;
+    target.hintUntil=game.elapsed+.55;
+    if(human) playerStatus("seeker","Ordinary prop. You can check again in a moment.");
+  }
+}
+
+function act(side=role,yaw=null) {
+  if(!isActive() || game.paused || (side==="seeker"&&game.phase==="hide")) return;
+  const target=actionTarget(side,yaw);
+  if(side==="hider") {
+    const h=game.hiders[0];
+    if(h.caught) return;
+    if(h.locked) { playerStatus(side,"Unlock your pose before changing disguise."); return; }
+    if(!target) { playerStatus(side,"Get closer to an object to copy it."); return; }
+    h.disguise=target.type;
+    h.rot=target.rot;
+    playerStatus(side,"Disguised as a "+target.type+". Stay still when the seeker is nearby.");
+  } else {
+    if(game.elapsed<game.cooldown) return;
+    if(!target) { playerStatus(side,"Get closer to a suspicious object and press E."); return; }
+    game.cooldown=game.elapsed+(game.hiders.includes(target)?.45:1.2);
+    inspect(target,true);
+  }
+}
+
+function rotateDisguise(side=role) {
+  if(!isActive()||game.paused||side!=="hider") return;
+  const h=game.hiders[0];
+  if(!h?.disguise||h.caught||h.locked) return;
+  h.rot=(h.rot+Math.PI/2)%(2*Math.PI);
+  h.movedUntil=game.elapsed+.45;
+  playerStatus(side,"Disguise turned. Line it up with nearby props.");
+  dirty=true;
+}
+
+function roleAbility(side=role) {
+  if(!isActive()||game.paused) return;
+  if(side==="hider") {
+    const h=game.hiders[0];
+    if(!h||h.caught) return;
+    if(!h.disguise) { playerStatus(side,"Copy a prop before locking your pose."); return; }
+    h.locked=!h.locked;
+    playerStatus(side,h.locked?"Pose locked. Press F to move again.":"Pose unlocked.");
+  } else {
+    if(game.phase!=="search"||game.elapsed<game.listenReady) return;
+    game.listenReady=game.elapsed+18;
+    const closest=game.hiders.filter(h=>!h.caught).sort((a,b)=>dist(a,game.seeker)-dist(b,game.seeker))[0];
+    if(closest&&dist(closest,game.seeker)<235) {
+      const spacing=T*2;
+      const coarse=(n)=>Math.floor(n/spacing)*spacing+spacing/2;
+      game.listenMark={x:coarse(closest.x),y:coarse(closest.y),radius:67,until:game.elapsed+3.25};
+      playerStatus(side,"Something rustled in the marked area.");
+    } else {
+      game.listenMark=null;
+      playerStatus(side,"No hider sounds close enough to hear.");
+    }
+  }
+  refresh();
+}
+
+function updateAbility() {
+  const button=$("roleAbility");
+  button.hidden=!isActive();
+  if(button.hidden) return;
+  const hider=role==="hider", me=game.hiders[0];
+  const cooldown=seconds((game.listenReady??0)-game.elapsed);
+  button.disabled=game.paused||(hider?(!me?.disguise||me.caught):(game.phase!=="search"||cooldown>0));
+  $("abilityKey").textContent=hider?"F":"Q";
+  $("abilityText").textContent=hider?(me?.locked?"Unlock pose":"Lock pose"):"Listen";
+  $("abilityState").textContent=hider?(me?.locked?"Locked":me?.disguise?"Ready":"Copy a prop"):
+    game.phase==="hide"?"During search":cooldown?cooldown+"s":"Ready";
+}
+
+function oddness(prop) {
+  const kind=prop.disguise||prop.type;
+  if(!kind) return 2;
+  const others=game.props.concat(game.hiders.filter(h=>!h.caught && h.disguise));
+  const peers=others.filter(p=>p!==prop && (p.disguise||p.type)===kind && visible(map,game.seeker,p,150) && dist(prop,p)<96).length;
+  return 1/(1+peers)+Math.random()*.65;
+}
+
+function botSeek(dt) {
+  const s=game.seeker;
+  if(game.elapsed>=s.think) {
+    s.think=game.elapsed+.38;
+    const observed=game.hiders.filter(h=>!h.caught && visible(map,s,h,210));
+    const suspicious=observed.find(h=>!h.disguise||h.movedUntil>game.elapsed);
+    if(suspicious) {
+      s.path=route(map,s,suspicious);
+      if(dist(s,suspicious)<49 && game.elapsed>=s.cooldown) {
+        inspect(suspicious,false);
+        s.cooldown=game.elapsed+.7;
+      }
+    } else if(!s.path.length) {
+      const nearby=observed.filter(h=>dist(h,s)<54);
+      const ordinary=game.props.filter(p=>visible(map,s,p,54));
+      if(game.elapsed>=s.cooldown && (nearby.length||ordinary.length) && Math.random()<.52) {
+        const candidates=nearby.concat(ordinary.filter(p=>!p.checked));
+        const target=candidates.map(p=>({p,score:oddness(p)})).sort((a,b)=>b.score-a.score)[0]?.p;
+        if(target) inspect(target,false);
+        s.cooldown=game.elapsed+1.2;
+      }
+      const options=game.props.concat(game.spots).filter(p=>dist(p,s)>78);
+      if(options.length) s.path=route(map,s,pick(options));
+    }
+  }
+  if(game.phase==="search") follow(s,105*dt);
+}
+
+function setStatus(message) {
+  if($("status").textContent!==message) $("status").textContent=message;
+}
+
+function resultOverlay(winner) {
+  $("overlayLabel").textContent=winner==="seeker"?"SEEKER WINS":"HIDERS WIN";
+  $("overlayTitle").textContent=winner===role?"You win!":"Round over";
+  const reveal=firstPerson?.active?"Switch to Board 3D or Top-down to see their disguises.":"Review the map to see their disguises.";
+  $("overlayText").textContent=winner==="seeker"?"All five hiders were found.":(5-game.found)+" of 5 hiders survived. "+reveal;
+  if(winner===role && role==="hider" && game.hiders[0].caught) $("overlayTitle").textContent="Your team wins!";
+  $("start").textContent=isGuest()?"Waiting for host":"Play again";
+  $("overlay").hidden=false;
+  $("review").hidden=false;
+  $("backResults").hidden=true;
+  $("reset").hidden=true;
+  $("pauseRound").hidden=true;
+}
+
+function finish(winner) {
+  game.phase="result";
+  game.winner=winner;
+  if(room) nextRole=opposite(role);
+  resultOverlay(winner);
+  setupControls();
+  keys.clear();
+  setStatus(room?"Roles swap for the rematch unless the host chooses a role.":"Choose another map, switch roles, or play again.");
+  $("start").focus();
+  refresh();
+  sendRoomState();
+}
+
+function setupControls() {
+  const side=nextRole??role;
+  $("environment").textContent=map.environment;
+  $("mapName").textContent=map.name;
+  $("mode").textContent=room?"TWO PLAYERS · "+(isGuest()?"GUEST":"HOST"):"SOLO PLAYTEST";
+  for(const button of mapButtons) {
+    const selected=maps[button.dataset.map]===map;
+    button.classList.toggle("active",selected);
+    button.setAttribute("aria-pressed",selected);
+    button.disabled=isGuest();
+  }
+  for(const name of ["seeker","hider"]) {
+    $(name).setAttribute("aria-pressed",side===name);
+    $(name).disabled=isGuest();
+  }
+  $("duration").disabled=isGuest();
+  $("start").disabled=isGuest();
+  $("actionHint").textContent=role==="seeker"?"Inspect nearby prop":"Copy nearby prop";
+  const rotating=role==="hider";
+  $("rotateControls").hidden=!rotating;
+  firstPerson?.phaseChanged();
+  $("setupNote").hidden=!room&&!isActive();
+  const note=isGuest()?"The host sets the map, roles, and timer.":isActive()?
+    "Map or role changes return to setup. Timer changes apply next round.":
+    "The host starts the round. Roles swap after a finished round.";
+  $("setupNote").textContent=note;
+}
+
+function lobby(message) {
+  if(!isGuest()) roomVersion++;
+  game=null;
+  firstPerson?.reset();
+  setupControls();
+  $("overlayLabel").textContent="HIDE & SEEK";
+  $("overlayTitle").textContent=(nextRole??role)==="seeker"?"Something looks off.":"Look like you belong.";
+  $("overlayText").textContent=(nextRole??role)==="seeker"?map.clue:"Copy an object that fits the room and stay still when the seeker passes by.";
+  $("start").textContent=isGuest()?"Waiting for host":"Start round";
+  $("overlay").hidden=false;
+  $("reset").hidden=true;
+  $("pauseRound").hidden=true;
+  $("review").hidden=true;
+  $("backResults").hidden=true;
+  keys.clear();
+  setStatus(message??(isGuest()?"Waiting for the host to start.":"Choose a map and role to begin."));
+  refresh();
+  sendRoomState();
+}
+
+function refresh() {
+  updateAbility();
+  const phase=game?.phase;
+  $("seekerWait").hidden=phase!=="hide"||role!=="seeker"||game.paused;
+  $("phase").textContent=phase==="hide"?"HIDE TIME":phase==="result"?"ROUND COMPLETE":"SEARCH TIME";
+  $("timer").textContent=time(game?.remaining??Number($("duration").value),true);
+  $("durationValue").textContent=time(Number($("duration").value));
+  const found=game?.found??0;
+  const pips=$("pips");
+  if(pips.dataset.found!==String(found)) {
+    pips.dataset.found=found;
+    pips.setAttribute("aria-label",found+" out of 5 hiders found");
+    pips.replaceChildren(...Array.from({length:5},(_,i)=>{
+      const pip=document.createElement("i");
+      if(i<found) pip.className="filled";
+      return pip;
+    }));
+  }
+  dirty=true;
+}
+
+function update(dt) {
+  game.elapsed+=dt;
+  game.remaining-=dt;
+  if(game.remaining<=0) {
+    if(game.phase==="search") { game.remaining=0; finish("hider"); return; }
+    game.phase="search";
+    game.remaining=game.duration;
+    playerStatus("seeker","Look for props out of place or on the move.");
+    playerStatus("hider","The seeker is out. Keep your disguise still.");
+  }
+  moveHuman(role,keyboardAxis(),dt);
+  if(room) moveHuman(opposite(role),performance.now()-guestLastInput>500?[0,0]:guestInput,dt);
+  for(const h of game.hiders) {
+    if(h.human||h.caught) continue;
+    if(h.path.length) {
+      follow(h,(game.phase==="hide"?115:76)*dt);
+      h.movedUntil=game.elapsed+.4;
+    }
+    if(!h.path.length && h.goal) {
+      h.disguise=h.goal.type;
+      h.rot=h.goal.rot;
+      h.goal=null;
+    }
+    if(game.phase==="search" && !h.path.length && h.think<game.elapsed &&
+       !visible(map,game.seeker,h,165)) chooseSpot(h);
+  }
+  if(!room&&role==="hider"&&game.phase==="search") botSeek(dt);
+  refresh();
+}
+
+function focusField() {
+  (firstPerson&&firstPerson.mode!=="flat"?$("scene"):$("field")).focus();
+}
+
+function keyboardAxis() {
+  if(firstPerson?.active) return firstPerson.axis();
+  const axis=(plus,minus)=>Number(plus.some(k=>keys.has(k)))-Number(minus.some(k=>keys.has(k)));
+  return [axis(["d","arrowright"],["a","arrowleft"]),axis(["s","arrowdown"],["w","arrowup"])];
+}
+
+function moveHuman(side,[dx,dy],dt) {
+  const controlled=side==="seeker"?game.seeker:game.hiders[0];
+  if(controlled.caught||controlled.locked || (side==="seeker"&&game.phase==="hide") || (!dx&&!dy)) return;
+  const delta=(side==="seeker"?149:controlled.disguise?104:135)*dt/Math.hypot(dx,dy);
+  const oldX=controlled.x, oldY=controlled.y;
+  move(controlled,dx*delta,dy*delta);
+  if(controlled.x!==oldX||controlled.y!==oldY) controlled.movedUntil=game.elapsed+.45;
+}
+
+function sendRoomState() {
+  if(!room||isGuest()) return;
+  const side=opposite(role);
+  const state=game && {
+    phase:game.phase,remaining:game.remaining,elapsed:game.elapsed,found:game.found,
+    winner:game.winner,props:game.props,listenReady:side==="seeker"?game.listenReady:0,listenMark:side==="seeker"?game.listenMark:null,seeker:{x:game.seeker.x,y:game.seeker.y},
+    mark:game.mark && (side==="hider"||visible(map,game.seeker,game.mark,260))?game.mark:null,
+    hiders:game.hiders.filter(h=>side==="hider"||game.phase==="result"||
+      (game.phase==="search"&&!h.caught&&visible(map,game.seeker,h,260)))
+      .map(({x,y,disguise,rot,caught,human,locked})=>({x,y,disguise,rot,caught,human,locked:side==="hider"&&locked}))
+  };
+  room.send({type:"state",version:roomVersion,map:mapKey(),role:side,nextRole:nextRole&&opposite(nextRole),
+    duration:Number($("duration").value),state,status:game?.guestStatus});
+}
+
+function receiveRoomMessage(message) {
+  if(!room||!message||typeof message!=="object") return;
+  if(!isGuest()) {
+    if(!isActive()||message.version!==roomVersion) return;
+    if(message.type==="input" && Array.isArray(message.axis) && message.axis.length===2 &&
+        message.axis.every(n=>Number.isFinite(n)&&Math.abs(n)<=1)) {
+      guestInput=message.axis;
+      guestLastInput=performance.now();
+    }
+    if(message.type==="action"&&(message.yaw==null||Number.isFinite(message.yaw))) act(opposite(role),message.yaw??null);
+    if(message.type==="rotate") rotateDisguise(opposite(role));
+    if(message.type==="ability") roleAbility(opposite(role));
+    return;
+  }
+  if(message.type!=="state"||!Object.hasOwn(maps,message.map)) return;
+  const fresh=roomVersion!==message.version;
+  const changed=fresh || game?.phase!==message.state?.phase;
+  roomVersion=message.version;
+  map=maps[message.map];
+  role=message.role;
+  nextRole=message.nextRole;
+  $("duration").value=message.duration;
+  game=message.state;
+  if(fresh) firstPerson?.reset();
+  if(!game) { lobby(); return; }
+  setupControls();
+  if(game.phase==="result") {
+    if(changed) resultOverlay(game.winner);
+    setStatus("Roles swap for the rematch unless the host chooses a role.");
+  } else {
+    $("overlay").hidden=true;
+    $("reset").hidden=true;
+    if(changed) focusField();
+    setStatus(message.status || (role==="seeker"?"The hiders are choosing disguises.":"Move near a prop and press E to copy it."));
+  }
+  refresh();
+}
+
+function attachRoom(connection) {
+  room=connection;
+  nextRole=null;
+  sentAt=0;
+  lobby(isGuest()?"Waiting for the host to start.":"Friend connected. Choose settings and start the round.");
+}
+
+function detachRoom() {
+  room=null;
+  guestInput=[0,0];
+  nextRole=null;
+  lobby("Room closed. Solo play is ready.");
+}
+
+function sendInput() {
+  if(isGuest()&&isActive()) room.send({type:"input",axis:keyboardAxis(),version:roomVersion});
+}
+
+function tick(now) {
+  const dt=Math.min(.05,(now-last)/1000);
+  last=now;
+  if(isActive()&&!game.paused&&firstPerson?.active) firstPerson.turn(dt);
+  if(isActive()&&!game.paused&&!isGuest()&&dt>0) update(dt);
+  if(isActive()&&room&&now>=sentAt) {
+    sentAt=now+(isGuest()?100:50);
+    if(isGuest()) sendInput();
+    else sendRoomState();
+  }
+  if(dirty) {
+    render();
+    dirty=false;
+  }
+  requestAnimationFrame(tick);
+}
+
+for(const button of mapButtons) {
+  const mini=button.querySelector("canvas").getContext("2d");
+  mini.scale(88/(W*T),53/(H*T));
+  const m=maps[button.dataset.map];
+  drawMap(mini,m,staticProps(m),false);
+  button.addEventListener("click",()=>{
+    if(isActive()&&map===m) return;
+    map=m;
+    lobby(isActive()?"Map changed. Start a new round when ready.":undefined);
+  });
+}
+for(const name of ["seeker","hider"]) $(name).addEventListener("click",()=>{
+  const active=isActive();
+  if(active && role===name) return;
+  role=name;
+  nextRole=null;
+  lobby(active?"Role changed. Start a new round when ready.":undefined);
+});
+$("duration").addEventListener("input",()=>{
+  if(isActive()) setStatus("Search duration updated for the next round.");
+  refresh();
+  sendRoomState();
+});
+$("start").addEventListener("click",()=>{
+  if(!game?.paused) { begin(); return; }
+  game.paused=false;
+  $("overlay").hidden=true;
+  $("pauseRound").hidden=false;
+  focusField();
+  refresh();
+});
+$("pauseRound").addEventListener("click",()=>{
+  if(room||!isActive()||game.paused) return;
+  game.paused=true;
+  releaseKeys();
+  firstPerson?.phaseChanged();
+  $("overlayLabel").textContent="SOLO PLAY";
+  $("overlayTitle").textContent="Paused";
+  $("overlayText").textContent="You can change the camera before resuming.";
+  $("start").textContent="Resume round";
+  $("overlay").hidden=false;
+  $("pauseRound").hidden=true;
+  $("start").focus();
+  refresh();
+});
+$("review").addEventListener("click",()=>{
+  if(game?.phase!=="result") return;
+  if(firstPerson?.active) $("view3d").click();
+  $("overlay").hidden=true;
+  $("backResults").hidden=false;
+  focusField();
+});
+$("backResults").addEventListener("click",()=>{
+  if(game?.phase==="result") { resultOverlay(game.winner); $("review").focus(); }
+});
+function useAbility() {
+  if(isGuest()) room.send({type:"ability",version:roomVersion});
+  else roleAbility();
+}
+$("roleAbility").addEventListener("click",()=>{ useAbility(); focusField(); });
+$("reset").addEventListener("click",()=>{
+  lobby();
+  $("start").focus();
+});
+const movement=["w","a","s","d","arrowup","arrowleft","arrowdown","arrowright"];
+window.addEventListener("keydown",(event)=>{
+  if(!isActive()||game.paused||event.altKey||event.ctrlKey||event.metaKey||
+     ["INPUT","TEXTAREA","BUTTON","SELECT","SUMMARY","A"].includes(event.target?.tagName)) return;
+  const k=event.key.toLowerCase();
+  if(!movement.includes(k)&&!["e","r","q","f"].includes(k)) return;
+  event.preventDefault();
+  if(k==="e"&&!event.repeat) {
+    const yaw=firstPerson?.active?firstPerson.yaw:null;
+    if(isGuest()) room.send({type:"action",yaw,version:roomVersion});
+    else act(role,yaw);
+  } else if(k==="r"&&!event.repeat) {
+    if(isGuest()) room.send({type:"rotate",version:roomVersion});
+    else rotateDisguise();
+  } else if(!event.repeat&&((k==="q"&&role==="seeker")||(k==="f"&&role==="hider"))) {
+    useAbility();
+  } else if(movement.includes(k)&&!keys.has(k)) {
+    keys.add(k);
+    sendInput();
+  }
+});
+window.addEventListener("keyup",(event)=>{
+  if(keys.delete(event.key.toLowerCase())) sendInput();
+});
+function releaseKeys() {
+  keys.clear();
+  sendInput();
+}
+window.addEventListener("blur",releaseKeys);
+$("field").addEventListener("blur",releaseKeys);
+$("field").addEventListener("pointerdown",()=>$("field").focus());
+lobby();
+requestAnimationFrame(tick);
+
+</script>
+<script>
+"use strict";
+
+let peer = null;
+let channel = null;
+let seat = null;
+let connected = false;
+let outbound = "";
+let disconnectTimer = null;
+const roomMessage = (message) => { $("roomStatus").textContent=message; };
+
+function exchange(showOutgoing, incomingLabel, action) {
+  $("roomChoices").hidden=true;
+  $("roomExchange").hidden=false;
+  $("outboundGroup").hidden=!showOutgoing;
+  $("inboundGroup").hidden=!incomingLabel;
+  $("outbound").value=outbound;
+  $("inboundLabel").textContent=incomingLabel??"";
+  $("acceptCode").textContent=action??"Connect";
+  $("leaveRoom").hidden=false;
+}
+
+function encode(description) {
+  return "BLEND1."+btoa(JSON.stringify({type:description.type,sdp:description.sdp}));
+}
+
+function decode(raw, expected) {
+  const code=raw.trim();
+  if(!code.startsWith("BLEND1.")||code.length>54000) throw Error("Copy the full Blend In code.");
+  let data;
+  try { data=JSON.parse(atob(code.slice(7))); }
+  catch { throw Error("Copy the full Blend In code."); }
+  if(data?.type!==expected||typeof data.sdp!=="string"||!data.sdp.startsWith("v=0")) {
+    throw Error(expected==="offer"?"Paste the host’s invite code.":"Paste your friend’s reply code.");
+  }
+  return data;
+}
+
+function closeRoom(message="Room closed. You can start a new room.") {
+  const old=peer;
+  peer=null;
+  channel=null;
+  seat=null;
+  outbound="";
+  clearTimeout(disconnectTimer);
+  disconnectTimer=null;
+  old?.close();
+  if(connected) detachRoom();
+  connected=false;
+  $("inbound").value="";
+  $("outbound").value="";
+  $("roomChoices").hidden=false;
+  $("roomExchange").hidden=true;
+  $("leaveRoom").hidden=true;
+  roomMessage(message);
+}
+
+function wireChannel(connection, dataChannel, side) {
+  channel=dataChannel;
+  function opened() {
+    if(peer!==connection||connected) return;
+    connected=true;
+    $("roomExchange").hidden=true;
+    roomMessage(side==="host"?"Friend connected. Start a round when you’re ready.":"Connected. The host starts the round.");
+    attachRoom({
+      side,
+      send(message) {
+        if(dataChannel.readyState==="open" && dataChannel.bufferedAmount<128000) {
+          dataChannel.send(JSON.stringify(message));
+        }
+      }
+    });
+    if(side==="guest") room.send({type:"ready"});
+  }
+  dataChannel.addEventListener("open",opened);
+  dataChannel.addEventListener("message",(event)=>{
+    if(peer!==connection||!connected||typeof event.data!=="string"||event.data.length>64000) return;
+    let data;
+    try { data=JSON.parse(event.data); }
+    catch { return; }
+    if(data?.type==="ready"&&side==="host") sendRoomState();
+    else receiveRoomMessage(data);
+  });
+  dataChannel.addEventListener("close",()=>{
+    if(peer===connection) closeRoom("Your friend disconnected. Start a new room to reconnect.");
+  });
+  if(dataChannel.readyState==="open") opened();
+}
+
+function newPeer(side) {
+  if(!window.RTCPeerConnection) throw Error("Use a current desktop browser with WebRTC support.");
+  const connection=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+  peer=connection;
+  seat=side;
+  connection.addEventListener("connectionstatechange",()=>{
+    if(peer!==connection) return;
+    const state=connection.connectionState;
+    clearTimeout(disconnectTimer);
+    if(state==="failed") closeRoom("Couldn’t connect directly. Try a shared Wi-Fi network or a different connection.");
+    if(state==="disconnected") disconnectTimer=setTimeout(()=>{
+      if(peer===connection) closeRoom("Connection lost. Create a new invite to reconnect.");
+    },8000);
+  });
+  if(side==="guest") connection.addEventListener("datachannel",(event)=>{
+    if(peer===connection&&event.channel.label==="blend-in") wireChannel(connection,event.channel,side);
+  });
+  else wireChannel(connection,connection.createDataChannel("blend-in"),side);
+  return connection;
+}
+
+async function localCode(connection, description) {
+  await connection.setLocalDescription(description);
+  if(connection.iceGatheringState!=="complete") {
+    await new Promise(resolve=>{
+      const timer=setTimeout(done,6000);
+      function done(){
+        clearTimeout(timer);
+        connection.removeEventListener("icegatheringstatechange",check);
+        resolve();
+      }
+      function check(){ if(connection.iceGatheringState==="complete") done(); }
+      connection.addEventListener("icegatheringstatechange",check);
+      check();
+    });
+  }
+  if(peer!==connection) return "";
+  return encode(connection.localDescription);
+}
+
+$("hostRoom").addEventListener("click",async ()=>{
+  exchange(false);
+  roomMessage("Creating a private invite…");
+  let connection;
+  try {
+    connection=newPeer("host");
+    outbound=await localCode(connection,await connection.createOffer());
+    if(peer!==connection) return;
+    exchange(true,"Paste your friend’s reply code","Connect");
+    roomMessage("Send the invite to your friend. They choose Join and send you a reply code.");
+  } catch(error) {
+    if(!connection||peer===connection) closeRoom(error.message||"Couldn’t create an invite.");
+  }
+});
+
+$("joinRoom").addEventListener("click",()=>{
+  seat="guest";
+  exchange(false,"Paste the host’s invite code","Make reply code");
+  roomMessage("Ask the host for their invite code.");
+  $("inbound").focus();
+});
+
+$("acceptCode").addEventListener("click",async ()=>{
+  if($("acceptCode").disabled||!seat) return;
+  const side=seat;
+  let connection=peer;
+  $("acceptCode").disabled=true;
+  try {
+    const remote=decode($("inbound").value,side==="guest"?"offer":"answer");
+    if(side==="guest") {
+      if(connection) { peer=null; connection.close(); }
+      connection=newPeer("guest");
+      await connection.setRemoteDescription(remote);
+      roomMessage("Creating a reply code…");
+      const reply=await localCode(connection,await connection.createAnswer());
+      if(peer!==connection) return;
+      outbound=reply;
+      exchange(true);
+      roomMessage("Send this reply code to the host and keep this tab open.");
+    } else {
+      await connection.setRemoteDescription(remote);
+      if(connected||peer!==connection) return;
+      exchange(false);
+      roomMessage("Connecting to your friend…");
+    }
+  } catch(error) {
+    if(!connection||peer===connection) roomMessage(error.message||"Couldn’t use that code.");
+  } finally {
+    $("acceptCode").disabled=false;
+  }
+});
+
+$("copyCode").addEventListener("click",async ()=>{
+  try {
+    await navigator.clipboard.writeText(outbound);
+    roomMessage(seat==="guest"?"Reply copied. Send it to the host.":"Invite copied. Send it to your friend.");
+  } catch {
+    $("outbound").focus();
+    $("outbound").select();
+    roomMessage("Code selected. Press Ctrl+C or Command+C to copy it.");
+  }
+});
+
+$("leaveRoom").addEventListener("click",()=>closeRoom());
+$("guestCopy").hidden=location.protocol==="file:";
+
+</script>
+<script>
+"use strict";
+
+const themes3d = {
+  cafe: {sky:"#577480",fog:"#547076",floor:["#b47e55","#a37b65","#d4aa80"],wall:"#405d5d",trim:"#cb9b69",accent:"#e6ad79",light:"#ffe0aa",yaw:-.72},
+  garden: {sky:"#a6cad0",fog:"#7ba494",floor:["#6b976e","#c2b488","#a79867"],wall:"#426e60",trim:"#78af91",accent:"#c3dc9c",light:"#e4f6c9",yaw:-.82},
+  depot: {sky:"#526680",fog:"#52677c",floor:["#777f88","#8c9296","#767a73"],wall:"#44546c",trim:"#6e849c",accent:"#f2bc64",light:"#b5e8f0",yaw:.36}
+};
+const colorCache = new Map();
+function rgb(hex) {
+  if(!colorCache.has(hex)) colorCache.set(hex,[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));
+  return colorCache.get(hex);
+}
+
+class Geometry {
+  constructor() {
+    this.data=[];
+  }
+  face(points,hex,shade=1) {
+    const [r,g,b]=rgb(hex);
+    for(let i=1;i<points.length-1;i++) {
+      for(const point of [points[0],points[i],points[i+1]]) this.data.push(...point,r*shade,g*shade,b*shade);
+    }
+  }
+  box(cx,y,cz,w,h,d,color,angle=0) {
+    const co=Math.cos(angle),si=Math.sin(angle);
+    const edge=[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];
+    const ring=height=>edge.map(([x,z])=>[cx+x*co-z*si,height,cz+x*si+z*co]);
+    const bottom=ring(y),top=ring(y+h);
+    this.face(top,color,1.04);
+    for(let i=0;i<4;i++) {
+      const j=(i+1)%4;
+      this.face([bottom[i],bottom[j],top[j],top[i]],color,[.91,.76,.65,.87][i]);
+    }
+  }
+  prism(cx,y,cz,bottom,top,h,color,n=8,angle=0) {
+    const ring=(radius,height)=>Array.from({length:n},(_,i)=>{
+      const a=i*Math.PI*2/n+angle;
+      return [cx+Math.cos(a)*radius,height,cz+Math.sin(a)*radius];
+    });
+    const base=ring(bottom,y),cap=ring(top,y+h);
+    this.face(cap,color,1.06);
+    for(let i=0;i<n;i++) {
+      const j=(i+1)%n;
+      this.face([base[i],base[j],cap[j],cap[i]],color,.78+.19*Math.cos(i*6.283/n-1));
+    }
+  }
+}
+
+function prop3d(g,type,x,z,angle=0) {
+  const box=(dx,y,dz,w,h,d,color)=>{
+    const c=Math.cos(angle),s=Math.sin(angle);
+    g.box(x+dx*c-dz*s,y,z+dx*s+dz*c,w,h,d,color,angle);
+  };
+  g.prism(x,.015,z,.35,.35,.001,"#465252",10);
+  switch(type) {
+    case "stool":
+      for(const a of [-.135,.135]) for(const b of [-.135,.135]) box(a,.02,b,.067,.37,.067,"#805242");
+      box(0,.36,0,.42,.093,.42,"#ce7059");
+      box(0,.451,.18,.39,.014,.04,"#efad83");
+      break;
+    case "pot":
+    case "plant":
+      g.prism(x,.018,z,.16,.24,.28,"#aa6550");
+      g.prism(x,.278,z,.25,.25,.05,"#db916a");
+      g.prism(x,.329,z,.19,.19,.03,"#503f33");
+      for(let i=0;i<5;i++) {
+        const a=angle+i*6.283/5;
+        const tall=type==="plant"?.26:.17;
+        g.prism(x+Math.cos(a)*.11,.35,z+Math.sin(a)*.11,.055,.15,tall+i*.025,i%2?"#76a65d":"#4a8853",5,a);
+        g.prism(x+Math.cos(a)*.11,.35+tall+i*.025,z+Math.sin(a)*.11,.15,.015,.095,"#80af68",5,a);
+      }
+      break;
+    case "table":
+    case "bench": {
+      const height=type==="table"?.59:.34;
+      for(const a of [-.24,.24]) for(const b of [-.13,.13]) box(a,.02,b,.063,height,.063,"#754f38");
+      box(0,height,0,.69,.074,.41,"#c98e5b");
+      if(type==="bench") {
+        box(-.24,height,.15,.059,.28,.055,"#7b5339");
+        box(.24,height,.15,.059,.28,.055,"#7b5339");
+        box(0,height+.19,.153,.69,.077,.065,"#c69661");
+      }
+      break;
+    }
+    case "can":
+      g.prism(x,.02,z,.19,.19,.27,"#478ea3");
+      g.prism(x,.29,z,.14,.09,.05,"#66b8bd");
+      box(-.20,.20,0,.32,.069,.067,"#65a9b9");
+      box(-.34,.19,0,.06,.108,.13,"#b0d0c0");
+      box(.21,.25,0,.08,.12,.07,"#72b6c9");
+      box(.16,.365,0,.14,.045,.07,"#72b6c9");
+      break;
+    case "barrel":
+      g.prism(x,.02,z,.226,.226,.50,"#44748e",12);
+      for(const y of [.10,.32,.492]) g.prism(x,y,z,.235,.235,.026,"#81adc1",12);
+      g.prism(x+.08,.518,z-.06,.046,.046,.02,"#d2bd8a",8);
+      break;
+    case "pallet":
+      for(const a of [-.23,0,.23]) box(a,.019,0,.10,.114,.62,"#876748");
+      for(const b of [-.25,-.125,0,.125,.25]) box(0,.13,b,.66,.055,.085,"#d6a96c");
+      break;
+    case "crate":
+      box(0,.021,0,.55,.46,.52,"#b48351");
+      for(const y of [.051,.413]) box(0,y,0,.568,.045,.54,"#e1b879");
+      box(.18,.021,0,.058,.46,.548,"#c99761");
+      break;
+    default:
+      box(0,.021,0,.50,.42,.50,"#be915f");
+      box(0,.441,0,.084,.008,.502,"#ead0a0");
+      box(0,.021,-.252,.09,.42,.008,"#d4b188");
+      box(.143,.30,-.258,.14,.063,.01,"#eee0bc");
+  }
+}
+
+function avatar3d(g,a,hider) {
+  const x=a.x/T,z=a.y/T;
+  g.prism(x,.012,z,.22,.22,.001,"#4d5257");
+  for(const dx of [-.087,.087]) g.box(x+dx,.02,z,.10,.26,.14,"#354450");
+  g.box(x,.25,z,.34,.35,.24,hider?"#ec8b65":"#9ec678");
+  g.prism(x,.59,z,.134,.135,.23,"#e8b68c");
+  g.prism(x,.77,z,.151,.129,.083,hider?"#7b524f":"#536b69");
+}
+
+function environment3d(m,theme,board=false) {
+  const g=new Geometry();
+  const kind=Object.keys(maps).find(k=>maps[k]===m);
+  for(let z=0;z<H;z++) for(let x=0;x<W;x++) {
+    if(blocked(m,x,z)) continue;
+    const zone=m.zones.find(([a,b,w,h])=>x>=a&&z>=b&&x<a+w&&z<b+h);
+    const color=theme.floor[zone?.[4]??0];
+    g.face([[x,0,z],[x+1,0,z],[x+1,0,z+1],[x,0,z+1]],color,.91+((x*41+z*13)%9)*.018);
+    const seam=kind==="cafe"?.016:.009;
+    g.box(x+.5,.001,z+seam/2,1,.004,seam,theme.wall);
+    g.box(x+seam/2,.001,z+.5,seam,.004,1,theme.wall);
+    if(kind==="cafe"&&zone?.[4]===2) {
+      const shade=(x+z)%2?"#b47960":"#edcda1";
+      g.box(x+.5,.004,z+.5,.19,.004,.19,shade,Math.PI/4);
+    }
+    if(kind==="depot"&&x%4===2&&z>1) {
+      g.box(x+.09,.004,z+.48,.047,.006,.54,theme.accent);
+    }
+    if(kind==="garden"&&zone?.[4]===1) {
+      g.box(x+.5,.004,z+.46,.79,.006,.67,"#b6aa84",((x+z)%3-1)*.045);
+    }
+  }
+  const boundary=[[0,0,W,1],[0,H-1,W,1],[0,1,1,H-2],[W-1,1,1,H-2]];
+  for(const [x,z,w,d] of [...boundary,...m.walls]) {
+    const outer=boundary.some(r=>r[0]===x&&r[1]===z);
+    const cx=x+w/2,cz=z+d/2;
+    const low=!outer&&((kind==="garden"&&w>=3&&x!==9)||(kind==="cafe"&&x===2));
+    const height=board?(outer?.33:low?.35:.54):low?(kind==="garden"?1.20:1.28):2.45;
+    g.box(cx,0,cz,w,height,d,theme.wall);
+    g.box(cx,.07,cz,w+.018,.09,d+.018,theme.trim);
+    g.box(cx,height-.08,cz,w+.045,.09,d+.045,theme.trim);
+    if(kind==="cafe") {
+      g.box(cx,board?.22:.76,cz,w+.019,.035,d+.019,theme.trim);
+      if(low) g.box(cx,height,cz,w+.10,.058,d+.11,"#bc835f");
+    }
+    if(kind==="garden") {
+      if(low) {
+        g.box(cx,height,cz,w-.09,.025,d-.09,"#4a624d");
+        for(let i=0;i<w*3;i++) {
+          const px=x+.17+i*.33,pz=cz+.19*Math.cos(i*2);
+          g.prism(px,height+.023,pz,.055,.13,.17+(i%3)*.04,i%2?"#77ab68":"#94be77",5);
+        }
+      } else {
+        for(let i=0;i<Math.max(w,d);i++) {
+          const px=w>d?x+.025+i:cx,pz=w>d?cz:z+.025+i;
+          g.box(px,.12,pz,w>d?.045:w+.015,height-.16,w>d?d+.015:.045,theme.trim);
+        }
+      }
+    }
+    if(kind==="depot"&&!outer) {
+      for(const level of board?[.16,.44]:[.39,.99,1.59,2.19]) g.box(cx,level,cz,w+.075,.044,d+.075,"#9b7952");
+      for(let i=0;i<Math.max(w,d);i++) {
+        const px=w>d?x+.025+i:cx,pz=w>d?cz:z+.025+i;
+        g.box(px,0,pz,w>d?.051:w+.1,height-.02,w>d?d+.1:.051,theme.trim);
+      }
+    }
+  }
+  for(const [x,z,w,d] of m.zones) {
+    const px=x+w/2,pz=z+d/2;
+    if(kind!=="garden"&&!board) {
+      g.box(px,2.62,pz,kind==="depot"?1.75:.64,.063,.31,"#35434c");
+      g.box(px,2.60,pz,kind==="depot"?1.62:.58,.018,.26,theme.light);
+    }
+  }
+  return g;
+}
+
+function shader(gl,type,source) {
+  const result=gl.createShader(type);
+  gl.shaderSource(result,source);
+  gl.compileShader(result);
+  if(!gl.getShaderParameter(result,gl.COMPILE_STATUS)) throw Error(gl.getShaderInfoLog(result));
+  return result;
+}
+
+function prepare3d(canvas) {
+  const gl=canvas.getContext("webgl",{alpha:false,antialias:true,powerPreference:"low-power"});
+  if(!gl) return null;
+  const program=gl.createProgram();
+  const vert=shader(gl,gl.VERTEX_SHADER,`
+    attribute vec3 position;
+    attribute vec3 tint;
+    uniform vec3 eye;
+    uniform vec4 turn;
+    uniform float aspect;
+    uniform float board;
+    varying vec3 paint;
+    varying float depth;
+    void main(){
+      if(board>0.5) {
+        vec3 off=position-vec3(10.0,0.0,6.0);
+        gl_Position=vec4(off.x*0.089+off.z*0.011,-off.z*0.137+off.y*0.207,(-off.z*0.64-off.y*0.77)/20.0,1.0);
+        depth=0.4;
+        paint=tint;
+        return;
+      }
+      vec3 off=position-eye;
+      float horizontal=dot(off.xz,vec2(-turn.y,turn.x));
+      float forward=dot(off.xz,turn.xy);
+      float vertical=off.y*turn.z-forward*turn.w;
+      depth=forward*turn.z+off.y*turn.w;
+      gl_Position=vec4(horizontal*1.62/aspect,vertical*1.62,1.004*depth-.11,depth);
+      paint=tint;
+    }`);
+  const frag=shader(gl,gl.FRAGMENT_SHADER,`
+    precision mediump float;
+    uniform vec3 haze;
+    varying vec3 paint;
+    varying float depth;
+    void main(){
+      float mist=smoothstep(1.8,12.0,depth)*0.81;
+      float nearby=0.82+0.19/(1.0+0.20*depth*depth);
+      gl_FragColor=vec4(mix(paint*nearby,haze,mist),1.0);
+    }`);
+  gl.attachShader(program,vert);
+  gl.attachShader(program,frag);
+  gl.linkProgram(program);
+  if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw Error(gl.getProgramInfoLog(program));
+  gl.deleteShader(vert);
+  gl.deleteShader(frag);
+  gl.useProgram(program);
+  gl.enable(gl.DEPTH_TEST);
+  const uniforms=Object.fromEntries(["eye","turn","aspect","haze","board"].map(name=>[name,gl.getUniformLocation(program,name)]));
+  const position=gl.getAttribLocation(program,"position"),tint=gl.getAttribLocation(program,"tint");
+  gl.enableVertexAttribArray(position);
+  gl.enableVertexAttribArray(tint);
+  const cache=new Map(), propsBuffer=gl.createBuffer(), moving=gl.createBuffer();
+  let propKey=null, propCount=0;
+  function bind(buffer) {
+    gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+    gl.vertexAttribPointer(position,3,gl.FLOAT,false,24,0);
+    gl.vertexAttribPointer(tint,3,gl.FLOAT,false,24,12);
+  }
+  return {
+    draw(key,theme,eye,yaw,pitch,objects,drawWorld,scenery,layoutKey,board=false) {
+      gl.viewport(0,0,canvas.width,canvas.height);
+      gl.clearColor(...rgb(drawWorld?(board?"#1a2931":theme.sky):"#17232c"),1);
+      gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+      if(!drawWorld) return;
+      gl.uniform1f(uniforms.board,Number(board));
+      gl.uniform3f(uniforms.eye,eye.x,eye.y,eye.z);
+      gl.uniform4f(uniforms.turn,Math.cos(yaw),Math.sin(yaw),Math.cos(pitch),Math.sin(pitch));
+      gl.uniform1f(uniforms.aspect,canvas.width/canvas.height);
+      gl.uniform3f(uniforms.haze,...rgb(theme.fog));
+      const worldKey=key+":"+board;
+      if(!cache.has(worldKey)) {
+        const mesh=environment3d(maps[key],theme,board);
+        const buffer=gl.createBuffer();
+        bind(buffer);
+        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(mesh.data),gl.STATIC_DRAW);
+        cache.set(worldKey,{buffer,count:mesh.data.length/6});
+      }
+      const data=cache.get(worldKey);
+      bind(data.buffer);
+      gl.drawArrays(gl.TRIANGLES,0,data.count);
+      bind(propsBuffer);
+      if(layoutKey!==propKey) {
+        const props=new Geometry();
+        for(const p of scenery) prop3d(props,p.type,p.x/T,p.y/T,p.rot);
+        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(props.data),gl.STATIC_DRAW);
+        propCount=props.data.length/6;
+        propKey=layoutKey;
+      }
+      gl.drawArrays(gl.TRIANGLES,0,propCount);
+      if(objects.data.length) {
+        bind(moving);
+        gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(objects.data),gl.STREAM_DRAW);
+        gl.drawArrays(gl.TRIANGLES,0,objects.data.length/6);
+      }
+    }
+  };
+}
+
+function initialiseView() {
+  const canvas=$("scene"), control3d=$("view3d"), control2d=$("view2d");
+  let renderer;
+  try { renderer=prepare3d(canvas); } catch { renderer=null; }
+
+  function unavailable(message) {
+    control3d.disabled=true;
+    $("graphicsStatus").hidden=false;
+    $("graphicsStatus").textContent=message;
+  }
+  if(!renderer) {
+    unavailable("3D is unavailable on this browser. Top-down play is ready.");
+    return;
+  }
+
+  const minimap=$("minimap"), mini=minimap.getContext("2d");
+  const boardHud=$("boardHud"), marks=boardHud.getContext("2d");
+  const motion=window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  function project(p,height=0) {
+    const x=p.x/T-10,z=p.y/T-6;
+    return [(x*.089+z*.011+1)*boardHud.width/2,(1+z*.137-height*.207)*boardHud.height/2];
+  }
+  function projectedRing(p,color,radius=16,height=.012) {
+    marks.beginPath();
+    for(let i=0;i<32;i++) {
+      const a=i*Math.PI/16;
+      const [x,y]=project({x:p.x+Math.cos(a)*radius,y:p.y+Math.sin(a)*radius},height);
+      if(i===0) marks.moveTo(x,y); else marks.lineTo(x,y);
+    }
+    marks.closePath();
+    marks.strokeStyle=color;
+    marks.lineWidth=2;
+    marks.stroke();
+  }
+  function drawBoardHud(me,covered) {
+    marks.clearRect(0,0,boardHud.width,boardHud.height);
+    if(covered) return;
+    const active=isActive();
+    if(!game) {
+      marks.font="700 11px system-ui";
+      for(const [x,y,,, ,name] of map.zones) {
+        const [px,py]=project(center(x,y));
+        const width=marks.measureText(name).width;
+        marks.fillStyle="#15232ae6";
+        marks.fillRect(px-6,py-10,width+12,19);
+        marks.fillStyle="#f6edd5";
+        marks.fillText(name,px,py+4);
+      }
+    }
+    if(!game) return;
+    const result=game.phase==="result";
+    if(result) {
+      for(const h of game.hiders) if(!h.caught) projectedRing(h,"#ffd49a",24);
+      return;
+    }
+    projectedRing(me,"#e9fba8",19);
+    if(role==="hider"&&game.phase==="search") {
+      const [x,y]=project(game.seeker,1.16);
+      projectedRing(game.seeker,"#e9fba8",19);
+      marks.fillStyle="#192923";
+      marks.fillRect(x-23,y-8,46,16);
+      marks.fillStyle="#e9fba8";
+      marks.font="700 10px system-ui";
+      marks.textAlign="center";
+      marks.fillText("SEEKER",x,y+3);
+      marks.textAlign="start";
+    }
+    if(role==="seeker"&&game.listenMark?.until>game.elapsed) {
+      projectedRing(game.listenMark,"#ffd49a",game.listenMark.radius);
+      projectedRing(game.listenMark,"#ffd49a",7);
+    }
+    if(!active||game.paused) return;
+    const target=actionTarget();
+    if(target) projectedRing(target,"#fff3c9",20);
+    if(game.mark?.until>game.elapsed) projectedRing(game.mark,"#e3fa9e",27);
+  }
+  let mapBuffer=null, mapBufferKey=null;
+  function mapHud(key,me,yaw) {
+    if(mapBufferKey!==key) {
+      mapBuffer=document.createElement("canvas");
+      mapBuffer.width=minimap.width;
+      mapBuffer.height=minimap.height;
+      const c=mapBuffer.getContext("2d");
+      c.scale(minimap.width/(W*T),minimap.height/(H*T));
+      drawMap(c,map,[],false);
+      mapBufferKey=key;
+    }
+    mini.drawImage(mapBuffer,0,0);
+    if(role==="seeker"&&game.listenMark?.until>game.elapsed) {
+      const {x,y,radius}=game.listenMark;
+      mini.beginPath();
+      mini.arc(x*minimap.width/(W*T),y*minimap.height/(H*T),radius*minimap.width/(W*T),0,Math.PI*2);
+      mini.strokeStyle="#fdd396";
+      mini.lineWidth=1.5;
+      mini.stroke();
+    }
+    const x=me.x*minimap.width/(W*T),y=me.y*minimap.height/(H*T);
+    mini.save();
+    mini.translate(x,y);
+    mini.rotate(yaw);
+    mini.fillStyle="#e1f99a";
+    mini.strokeStyle="#26342b";
+    mini.lineWidth=1;
+    mini.beginPath();
+    mini.moveTo(6,0);
+    mini.lineTo(-3,4);
+    mini.lineTo(-2,0);
+    mini.lineTo(-3,-4);
+    mini.closePath();
+    mini.fill();
+    mini.stroke();
+    mini.restore();
+  }
+
+  const view={
+    mode:"flat",
+    get active() { return this.mode==="first"; },
+    yaw:0,
+    reset() {
+      const key=mapKey();
+      const origin=role==="hider"?center(...map.entry):center(...map.spawn);
+      const ahead=role==="hider"?nearest(staticProps(map),origin,125):null;
+      this.yaw=ahead?Math.atan2(ahead.y-origin.y,ahead.x-origin.x):themes3d[key].yaw;
+      dirty=true;
+    },
+    axis() {
+      const held=(...options)=>Number(options.some(k=>keys.has(k)));
+      const f=held("w","arrowup")-held("s","arrowdown"), r=held("d")-held("a");
+      const scale=Math.max(1,Math.hypot(f,r));
+      const co=Math.cos(this.yaw),si=Math.sin(this.yaw);
+      return [(f*co-r*si)/scale,(f*si+r*co)/scale];
+    },
+    turn(dt) {
+      const delta=(Number(keys.has("arrowright"))-Number(keys.has("arrowleft")))*dt*2.2;
+      if(delta) {
+        this.yaw=(this.yaw+delta)%(Math.PI*2);
+        dirty=true;
+        sendInput();
+      }
+    },
+    phaseChanged() {
+      $("lookControls").hidden=!this.active;
+      $("movementHint").textContent=this.active?"Move and sidestep":"Move / arrow keys";
+      if((!isActive()||game.paused)&&document.pointerLockElement===canvas) document.exitPointerLock();
+    },
+    draw() {
+      const fixed=this.mode==="board";
+      const key=mapKey(), theme=themes3d[key];
+      const active=isActive();
+      const covered=active&&role==="seeker"&&game.phase==="hide";
+      const me=(role==="seeker"?game?.seeker:game?.hiders[0])??center(...map.spawn);
+      const eye={x:me.x/T,y:1.03,z:me.y/T};
+      const objects=new Geometry();
+      if(game&&!covered) {
+        const result=game.phase==="result";
+        if(fixed||role==="hider"&&game.phase==="search") {
+          avatar3d(objects,game.seeker,false);
+        }
+        for(const h of game.hiders) {
+          if((!fixed&&h===me)||h.caught) continue;
+          if(!result&&(role==="seeker"||!fixed)&&!visible(map,me,h,260)) continue;
+          if(h.disguise) prop3d(objects,h.disguise,h.x/T,h.y/T,h.rot);
+          else avatar3d(objects,h,true);
+        }
+      }
+      renderer.draw(key,theme,eye,this.yaw,-.36,objects,!covered,game?.props??staticProps(map),key+":"+(game?roomVersion:"lobby"),fixed);
+      $("viewHud").hidden=fixed||!active||covered;
+      if(fixed) { drawBoardHud(me,covered); return; }
+      if(!active||covered) return;
+      mapHud(key,me,this.yaw);
+      const disguise=$("disguiseHud");
+      disguise.hidden=role!=="hider";
+      disguise.textContent=me.caught?"Caught":me.disguise?me.disguise+" · R to rotate":"No disguise";
+      const target=actionTarget(role,this.yaw);
+      const prompt=target?(role==="hider"?"E · Copy prop":"E · Inspect"):"";
+      $("focusPrompt").textContent=prompt;
+      $("reticle").classList.toggle("ready",Boolean(target));
+    }
+  };
+
+  function setView(mode) {
+    if(mode==="first"&&motion?.matches) mode="board";
+    view.mode=mode;
+    control3d.setAttribute("aria-pressed",mode==="board");
+    control2d.setAttribute("aria-pressed",mode==="flat");
+    $("viewFirst").checked=mode==="first";
+    canvas.hidden=mode==="flat";
+    canvas.setAttribute("aria-label",mode==="board"?"Fixed 3D game board":"First-person 3D view");
+    $("field").hidden=mode!=="flat";
+    boardHud.hidden=mode!=="board";
+    $("viewHud").hidden=true;
+    if(mode!=="first"&&document.pointerLockElement===canvas) document.exitPointerLock();
+    view.phaseChanged();
+    view.reset();
+    if(game?.phase==="result"&&!$("overlay").hidden) resultOverlay(game.winner);
+    if(isActive()&&!game.paused) focusField();
+  }
+  firstPerson=view;
+  control3d.addEventListener("click",()=>{ if(view.mode!=="board") setView("board"); });
+  control2d.addEventListener("click",()=>{ if(view.mode!=="flat") setView("flat"); });
+  $("motionOption").hidden=false;
+  $("viewFirst").addEventListener("change",()=>setView($("viewFirst").checked?"first":"board"));
+  function motionPreference() {
+    $("viewFirst").disabled=!!motion?.matches;
+    if(motion?.matches&&view.active) setView("board");
+  }
+  motion?.addEventListener("change",motionPreference);
+  motionPreference();
+  canvas.addEventListener("blur",releaseKeys);
+  canvas.addEventListener("pointerdown",()=>{
+    focusField();
+    if(!view.active||!isActive()||game.paused||(role==="seeker"&&game.phase==="hide")||!canvas.requestPointerLock) return;
+    try {
+      const request=canvas.requestPointerLock();
+      request?.catch(()=>{});
+    } catch { /* Arrow keys remain available. */ }
+  });
+  document.addEventListener("mousemove",event=>{
+    if(document.pointerLockElement!==canvas||!view.active||!isActive()) return;
+    view.yaw=(view.yaw+event.movementX*.0033)%(Math.PI*2);
+    dirty=true;
+    sendInput();
+  });
+  canvas.addEventListener("webglcontextlost",event=>{
+    event.preventDefault();
+    setView("flat");
+    $("motionOption").hidden=true;
+    unavailable("3D graphics paused. You can continue in Top-down.");
+  });
+  canvas.addEventListener("webglcontextrestored",()=>{
+    try { renderer=prepare3d(canvas); } catch { renderer=null; }
+    if(renderer) {
+      control3d.disabled=false;
+      $("motionOption").hidden=false;
+      motionPreference();
+      $("graphicsStatus").hidden=true;
+    }
+  });
+  setView("board");
+}
+
+initialiseView();
+
+</script>
+</body>
+</html>
